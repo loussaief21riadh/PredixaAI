@@ -7,8 +7,11 @@ from backend.app.core.config import settings
 
 app = FastAPI()
 
+from backend.app.routers import health, version, predict
+
 app.include_router(health.router)
 app.include_router(version.router)
+app.include_router(predict.router)
 
 @app.get("/")
 def read_root():
