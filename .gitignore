@@ -1,1 +1,10 @@
 .aider*
+__pycache__/
+*.pyc
+.venv/
+.env
+build/
+.dart_tool/
+.idea/
+.vscode/
+.DS_Store
