@@ -1,20 +1,14 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+
+from backend.app.database import get_db
+from backend.app.routers import health, version
 
 app = FastAPI()
+
+app.include_router(health.router)
+app.include_router(version.router)
 
 @app.get("/")
 def read_root():
     return {"message": "LottoVisionAI Backend Running"}
-
-@app.get("/health")
-def health_check():
-    """Check if the application is healthy."""
-    return {"status": "healthy"}
-
-@app.get("/version")
-def get_version():
-    """Get the version of the application."""
-    return {
-        "app": "LottoVisionAI",
-        "version": "0.1.0"
-    }
