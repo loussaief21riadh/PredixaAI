@@ -2,12 +2,10 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.routers import health, version
+from backend.app.routers import health, version, predict
 from backend.app.core.config import settings
 
 app = FastAPI()
-
-from backend.app.routers import health, version, predict
 
 app.include_router(health.router)
 app.include_router(version.router)

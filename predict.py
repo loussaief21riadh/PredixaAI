@@ -1,4 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from backend.app.database import get_db
 
 router = APIRouter(
     prefix="/predict",
@@ -6,7 +9,7 @@ router = APIRouter(
 )
 
 @router.get("/")
-def predict():
+def predict(db: Session = Depends(get_db)):
     """Predict endpoint."""
     return {
         "prediction": "Not implemented yet",
