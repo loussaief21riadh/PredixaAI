@@ -1,16 +1,35 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 
-from backend.app.database import get_db
-from backend.app.routers import health, version, predict
-from backend.app.core.config import settings
+from app.core.config import settings
+from app.database import Base, engine
 
-app = FastAPI()
+# Import des modèles
+from app.models.draw import Draw
 
+# Import des routes
+from app.routers import health, version, predict, draws
+
+# Création des tables
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title=settings.app_name,
+    version=settings.app_version,
+    description="Backend API for LottoVisionAI",
+)
+
+# Routes
 app.include_router(health.router)
 app.include_router(version.router)
 app.include_router(predict.router)
+app.include_router(draws.router)
+
 
 @app.get("/")
-def read_root():
-    return {"message": f"{settings.app_name} Backend Running"}
+def root():
+    return {
+        "application": settings.app_name,
+        "version": settings.app_version,
+        "status": "running",
+        "database": "connected",
+    }

@@ -1,8 +1,14 @@
-import os
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
-    app_name: str = os.getenv("APP_NAME", "LottoVisionAI")
-    version: str = os.getenv("VERSION", "0.1.0")
+    app_name: str = "LottoVisionAI"
+    app_version: str = "1.0.0"
+    database_url: str = "sqlite:///./sql_app.db"
+
+    model_config = {
+        "env_file": ".env"
+    }
+
 
 settings = Settings()
