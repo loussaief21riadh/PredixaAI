@@ -1,15 +1,18 @@
 from fastapi import FastAPI
 
 from app.database import Base, engine
-from app.models.draw import Draw
 
-from app.routers.health import router as health_router
-from app.routers.version import router as version_router
-from app.routers.predict import router as predict_router
-from app.routers.draws import router as draws_router
-from app.routers.import_csv import router as import_router
-from app.routers.statistics import router as statistics_router
+from app.routers import (
+    ai,
+    draws,
+    health,
+    import_csv,
+    predict,
+    statistics,
+    version,
+)
 
+# Création des tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -18,19 +21,18 @@ app = FastAPI(
     description="AI Lottery Prediction Platform",
 )
 
-app.include_router(health_router)
-app.include_router(version_router)
-app.include_router(draws_router)
-app.include_router(predict_router)
-app.include_router(import_router)
-app.include_router(statistics_router)
-
 
 @app.get("/")
 def root():
     return {
-        "application": "Predixa AI",
-        "version": "1.0.0",
-        "status": "running",
-        "database": "connected",
+        "message": "Welcome to Predixa AI",
     }
+
+
+app.include_router(health.router)
+app.include_router(version.router)
+app.include_router(draws.router)
+app.include_router(predict.router)
+app.include_router(import_csv.router)
+app.include_router(statistics.router)
+app.include_router(ai.router)

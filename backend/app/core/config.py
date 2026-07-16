@@ -1,14 +1,11 @@
-from pydantic_settings import BaseSettings
+from app.core.settings import *
 
+"""
+Global configuration loader.
 
-class Settings(BaseSettings):
-    app_name: str = "Predixa AI"
-    app_version: str = "1.0.0"
-    database_url: str = "sqlite:///./sql_app.db"
+Import project settings from here.
 
-    model_config = {
-        "env_file": ".env"
-    }
+Example:
 
-
-settings = Settings()
+from app.core.config import PROJECT_NAME
+"""

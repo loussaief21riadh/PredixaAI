@@ -1,6 +1,9 @@
-from . import health
-from . import version
-from . import predict
-from . import draws
-from . import import_csv
-from . import statistics
+from . import (
+    ai,
+    draws,
+    health,
+    import_csv,
+    predict,
+    statistics,
+    version,
+)
