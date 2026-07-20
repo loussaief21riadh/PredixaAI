@@ -14,25 +14,22 @@ class SumAnalyzer:
 
         for draw in engine.all_draws():
 
-            total = (
-                draw.n1
-                + draw.n2
-                + draw.n3
-                + draw.n4
-                + draw.n5
-            )
+            numbers = engine.draw_main_numbers(draw)
+
+            # Ignore incomplete draws
+            if len(numbers) != 5:
+                continue
+
+            total = sum(numbers)
 
             counter[total] += 1
 
-        result = []
-
-        for total, count in sorted(counter.items()):
-
-            result.append(
-                {
-                    "sum": total,
-                    "count": count,
-                }
+        return [
+            {
+                "sum": total,
+                "count": count,
+            }
+            for total, count in sorted(
+                counter.items()
             )
-
-        return result
+        ]

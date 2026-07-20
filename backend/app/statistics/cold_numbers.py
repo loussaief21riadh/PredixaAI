@@ -1,4 +1,5 @@
 from collections import Counter
+
 from sqlalchemy.orm import Session
 
 from app.statistics.analyzer import StatisticsEngine
@@ -11,25 +12,33 @@ class ColdNumbersAnalyzer:
         db: Session,
         limit: int = 10,
     ):
-
         engine = StatisticsEngine(db)
 
         numbers = engine.all_numbers()
 
         counter = Counter(numbers)
 
-        result = []
+        # Guarantee that every main Loto number
+        # from 1 to 49 is represented.
+        frequencies = {
+            number: counter.get(number, 0)
+            for number in range(1, 50)
+        }
 
-        for number, count in sorted(
-            counter.items(),
-            key=lambda item: item[1]
-        )[:limit]:
+        # Sort by frequency, then by number
+        # for deterministic results.
+        cold_numbers = sorted(
+            frequencies.items(),
+            key=lambda item: (
+                item[1],
+                item[0],
+            ),
+        )[:limit]
 
-            result.append(
-                {
-                    "number": number,
-                    "count": count,
-                }
-            )
-
-        return result
+        return [
+            {
+                "number": number,
+                "count": count,
+            }
+            for number, count in cold_numbers
+        ]

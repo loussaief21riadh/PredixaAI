@@ -8,43 +8,59 @@ class OverdueAnalyzer:
 
         engine = StatisticsEngine(db)
 
-        draws = list(reversed(engine.all_draws()))
+        # Most recent draw first
+        draws = list(
+            reversed(
+                engine.all_draws()
+            )
+        )
 
-        last_seen = {}
+        last_seen = {
+            number: None
+            for number in range(1, 50)
+        }
 
         for draw_index, draw in enumerate(draws):
 
-            numbers = [
-                draw.n1,
-                draw.n2,
-                draw.n3,
-                draw.n4,
-                draw.n5,
-                draw.n6,
-                draw.bonus,
-                draw.chance,
-            ]
-
-            numbers = [n for n in numbers if n is not None]
+            numbers = engine.draw_main_numbers(
+                draw
+            )
 
             for number in numbers:
 
-                if number not in last_seen:
+                if last_seen[number] is None:
                     last_seen[number] = draw_index
+
+            # Stop early if all 49 numbers
+            # have already been found
+            if all(
+                value is not None
+                for value in last_seen.values()
+            ):
+                break
 
         result = []
 
-        for number, missed in sorted(
-            last_seen.items(),
-            key=lambda item: item[1],
-            reverse=True,
-        ):
+        for number in range(1, 50):
+
+            missed = last_seen[number]
 
             result.append(
                 {
                     "number": number,
-                    "draws_since_last_seen": missed,
+                    "draws_since_last_seen": (
+                        missed
+                        if missed is not None
+                        else len(draws)
+                    ),
                 }
             )
 
-        return result
+        return sorted(
+            result,
+            key=lambda item: (
+                item["draws_since_last_seen"],
+                item["number"],
+            ),
+            reverse=True,
+        )

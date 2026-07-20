@@ -12,13 +12,7 @@ class EvenOddAnalyzer:
 
         for draw in engine.all_draws():
 
-            numbers = [
-                draw.n1,
-                draw.n2,
-                draw.n3,
-                draw.n4,
-                draw.n5,
-            ]
+            numbers = engine.draw_main_numbers(draw)
 
             even = sum(
                 1
@@ -26,7 +20,7 @@ class EvenOddAnalyzer:
                 if number % 2 == 0
             )
 
-            odd = 5 - even
+            odd = len(numbers) - even
 
             key = f"{even}-{odd}"
 

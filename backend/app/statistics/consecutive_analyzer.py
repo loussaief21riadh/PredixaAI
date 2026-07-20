@@ -14,32 +14,26 @@ class ConsecutiveAnalyzer:
 
         for draw in engine.all_draws():
 
-            numbers = sorted([
-                draw.n1,
-                draw.n2,
-                draw.n3,
-                draw.n4,
-                draw.n5,
-            ])
-
-            consecutive = 0
-
-            for i in range(4):
-
-                if numbers[i + 1] == numbers[i] + 1:
-                    consecutive += 1
-
-            counter[consecutive] += 1
-
-        result = []
-
-        for value in sorted(counter.keys()):
-
-            result.append(
-                {
-                    "consecutive_pairs": value,
-                    "draws": counter[value],
-                }
+            numbers = sorted(
+                engine.draw_main_numbers(draw)
             )
 
-        return result
+            # Ignore incomplete draws
+            if len(numbers) != 5:
+                continue
+
+            consecutive_pairs = sum(
+                1
+                for i in range(len(numbers) - 1)
+                if numbers[i + 1] == numbers[i] + 1
+            )
+
+            counter[consecutive_pairs] += 1
+
+        return [
+            {
+                "consecutive_pairs": value,
+                "draws": counter[value],
+            }
+            for value in sorted(counter)
+        ]
