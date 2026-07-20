@@ -5,37 +5,61 @@ from pathlib import Path
 class CSVImporter:
     """
     CSV Import Engine for Predixa AI
+    Supports automatic delimiter detection.
     """
 
-    def __init__(self, filepath: str):
+    def __init__(self, filepath: str | Path):
         self.filepath = Path(filepath)
 
-    def detect_delimiter(self):
+    def detect_delimiter(self) -> str:
         """
-        Detect automatically if CSV uses ';' or ','
+        Detect whether the CSV uses ';' or ','.
         """
 
-        with open(self.filepath, "r", encoding="utf-8") as f:
-            sample = f.read(2048)
+        with self.filepath.open(
+            "r",
+            encoding="utf-8",
+        ) as file:
+
+            sample = file.read(4096)
 
         if sample.count(";") > sample.count(","):
             return ";"
 
         return ","
 
-    def load(self):
+    def load(self) -> list[dict]:
         """
-        Load CSV file
+        Load the CSV into a list of dictionaries.
         """
 
         delimiter = self.detect_delimiter()
 
-        with open(
-            self.filepath,
-            newline="",
+        with self.filepath.open(
+            "r",
             encoding="utf-8",
-        ) as csvfile:
+            newline="",
+        ) as file:
 
-            reader = csv.DictReader(csvfile, delimiter=delimiter)
+            reader = csv.DictReader(
+                file,
+                delimiter=delimiter,
+            )
 
-            return list(reader)
+            rows = list(reader)
+
+        return rows
+
+    def exists(self) -> bool:
+        """
+        Check if the CSV file exists.
+        """
+
+        return self.filepath.exists()
+
+    def count_rows(self) -> int:
+        """
+        Return the number of data rows.
+        """
+
+        return len(self.load())
