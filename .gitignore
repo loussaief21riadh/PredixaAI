@@ -137,3 +137,4 @@ docker-compose.override.yml
 #################################################
 
 Thumbs.db
+.aider*

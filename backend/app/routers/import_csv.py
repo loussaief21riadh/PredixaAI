@@ -50,6 +50,7 @@ def upload_csv(
         - CSV validation
         - Automatic delimiter detection
         - Duplicate detection
+        - Legacy and modern Loto support
         - Per-row error handling
         - Temporary file cleanup
     """
@@ -60,22 +61,14 @@ def upload_csv(
             detail="Missing filename.",
         )
 
-    original_filename = Path(
-        file.filename
-    ).name
+    original_filename = Path(file.filename).name
 
-    if (
-        Path(original_filename)
-        .suffix
-        .lower()
-        != ".csv"
-    ):
+    if Path(original_filename).suffix.lower() != ".csv":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Only CSV files are allowed.",
         )
 
-    # Unique temporary filename prevents collisions
     destination = (
         UPLOAD_FOLDER
         / f"{uuid4().hex}_{original_filename}"
@@ -87,16 +80,14 @@ def upload_csv(
 
     try:
 
-        # Save uploaded file
+        # Save temporary uploaded file
         with destination.open("wb") as buffer:
             shutil.copyfileobj(
                 file.file,
                 buffer,
             )
 
-        importer = CSVImporter(
-            destination
-        )
+        importer = CSVImporter(destination)
 
         rows = importer.load()
 
@@ -107,33 +98,47 @@ def upload_csv(
 
             try:
 
-                draw = LotoParser.parse(
-                    row
-                )
+                draw = LotoParser.parse(row)
 
-                # Duplicate check
+                # -------------------------------------------------
+                # Duplicate detection
+                #
+                # Same date is NOT sufficient because historical
+                # FDJ datasets may contain more than one draw
+                # on the same day.
+                # -------------------------------------------------
+
                 duplicate_query = (
                     db.query(Draw)
                     .filter(
-                        Draw.draw_date
-                        == draw["draw_date"]
+                        Draw.game == draw["game"],
+                        Draw.draw_date == draw["draw_date"],
+                        Draw.n1 == draw["n1"],
+                        Draw.n2 == draw["n2"],
+                        Draw.n3 == draw["n3"],
+                        Draw.n4 == draw["n4"],
+                        Draw.n5 == draw["n5"],
                     )
                 )
 
-                # If parser provides game,
-                # include it in duplicate detection
-                if draw.get("game"):
-                    duplicate_query = (
-                        duplicate_query.filter(
-                            Draw.game
-                            == draw["game"]
-                        )
+                # Legacy fields
+                if draw.get("n6") is not None:
+                    duplicate_query = duplicate_query.filter(
+                        Draw.n6 == draw["n6"]
                     )
 
-                exists = (
-                    duplicate_query
-                    .first()
-                )
+                if draw.get("bonus") is not None:
+                    duplicate_query = duplicate_query.filter(
+                        Draw.bonus == draw["bonus"]
+                    )
+
+                # Modern Loto field
+                if draw.get("chance") is not None:
+                    duplicate_query = duplicate_query.filter(
+                        Draw.chance == draw["chance"]
+                    )
+
+                exists = duplicate_query.first()
 
                 if exists:
                     skipped += 1
@@ -143,9 +148,7 @@ def upload_csv(
                     **draw
                 )
 
-                db.add(
-                    db_draw
-                )
+                db.add(db_draw)
 
                 imported += 1
 
@@ -158,7 +161,6 @@ def upload_csv(
                     }
                 )
 
-        # Save all valid rows
         db.commit()
 
         return {

@@ -7,60 +7,178 @@ from app.models.draw import Draw
 
 class DatasetBuilder:
     """
-    Construit le dataset Machine Learning.
+    Predixa AI V4-D lagged dataset builder.
 
-    X : variables explicatives (features)
+    Rule:
+        To predict target T, features are built only
+        from draws up to T-2.
 
-    y : dictionnaire contenant 49 cibles binaires
-        (une cible par numéro de loto)
+    Therefore T-1 is intentionally excluded from X.
+
+    This experiment is designed to prevent the model
+    from directly learning to reproduce the immediately
+    preceding draw.
     """
 
+    WINDOW_SIZE = 100
+
+    MODERN_LOTO_START_DATE = "2008-10-06"
+
+    LAG_DRAWS = 1
+
     @staticmethod
-    def build(db: Session):
+    def build(
+        db: Session,
+        window_size: int | None = None,
+    ):
+        if window_size is None:
+            window_size = DatasetBuilder.WINDOW_SIZE
+
+        if window_size < 100:
+            raise ValueError(
+                "Predixa AI V4-D requires "
+                "window_size >= 100."
+            )
 
         draws = (
             db.query(Draw)
-            .order_by(Draw.draw_date.asc())
+            .filter(
+                Draw.draw_date
+                >= DatasetBuilder.MODERN_LOTO_START_DATE
+            )
+            .order_by(
+                Draw.draw_date.asc(),
+                Draw.id.asc(),
+            )
             .all()
         )
 
-        rows = []
+        minimum_required = (
+            window_size
+            + DatasetBuilder.LAG_DRAWS
+            + 1
+        )
 
-        for draw in draws:
+        if len(draws) < minimum_required:
+            raise ValueError(
+                "Not enough modern draws. "
+                f"At least {minimum_required} are required."
+            )
 
-            numbers = [
-                draw.n1,
-                draw.n2,
-                draw.n3,
-                draw.n4,
-                draw.n5,
+        feature_rows = []
+        target_rows = []
+
+        # --------------------------------------------------
+        # Example with window_size=100
+        #
+        # target T = draws[101]
+        #
+        # T-1 = draws[100] -> intentionally excluded
+        #
+        # features:
+        # draws[0:100]
+        #
+        # target:
+        # draws[101]
+        # --------------------------------------------------
+
+        first_target_index = (
+            window_size
+            + DatasetBuilder.LAG_DRAWS
+        )
+
+        for target_index in range(
+            first_target_index,
+            len(draws),
+        ):
+
+            feature_end_index = (
+                target_index
+                - DatasetBuilder.LAG_DRAWS
+            )
+
+            feature_start_index = (
+                feature_end_index
+                - window_size
+            )
+
+            history = draws[
+                feature_start_index:
+                feature_end_index
             ]
 
-            features = FeatureEngineering.build(numbers)
+            target_draw = draws[
+                target_index
+            ]
 
-            # Création de 49 colonnes cibles
-            for number in range(1, 50):
-
-                features[f"target_{number}"] = (
-                    1 if number in numbers else 0
+            if len(history) != window_size:
+                raise ValueError(
+                    "Invalid lagged history size."
                 )
 
-            rows.append(features)
+            features = (
+                FeatureEngineering
+                .build_from_history(
+                    history,
+                    window_size=window_size,
+                )
+            )
 
-        df = pd.DataFrame(rows)
+            target_numbers = {
+                target_draw.n1,
+                target_draw.n2,
+                target_draw.n3,
+                target_draw.n4,
+                target_draw.n5,
+            }
 
-        feature_columns = [
-            c for c in df.columns
-            if not c.startswith("target_")
-        ]
+            targets = {
+                f"target_{number}": (
+                    1
+                    if number in target_numbers
+                    else 0
+                )
+                for number in range(
+                    1,
+                    50,
+                )
+            }
 
-        target_columns = [
-            c for c in df.columns
-            if c.startswith("target_")
-        ]
+            feature_rows.append(
+                features
+            )
 
-        X = df[feature_columns]
+            target_rows.append(
+                targets
+            )
 
-        y = df[target_columns]
+        X = pd.DataFrame(
+            feature_rows
+        )
+
+        y = pd.DataFrame(
+            target_rows
+        )
+
+        if X.empty or y.empty:
+            raise ValueError(
+                "The V4-D dataset is empty."
+            )
+
+        if len(X) != len(y):
+            raise ValueError(
+                "Feature and target datasets "
+                "have different sizes."
+            )
+
+        if X.isnull().any().any():
+            raise ValueError(
+                "Feature dataset contains missing values."
+            )
+
+        if y.isnull().any().any():
+            raise ValueError(
+                "Target dataset contains missing values."
+            )
 
         return X, y

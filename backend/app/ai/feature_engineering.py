@@ -1,77 +1,163 @@
-from statistics import mean, median
+from statistics import mean
+
+from app.ai.features.frequency import FrequencyFeatures
+from app.models.draw import Draw
 
 
 class FeatureEngineering:
     """
-    Construit les variables (features) utilisées par les modèles IA.
+    Predixa AI V4-E Feature Engineering.
+
+    Experimental configuration:
+
+    - T-2 lag is handled by the dataset/backtester.
+    - Delay features removed.
+    - Momentum features removed.
+    - Trend features removed.
+    - Raw frequency features retained.
+
+    Expected feature count:
+
+        4 global structural features
+        196 frequency features
+
+        Total = 200 features
     """
 
     @staticmethod
-    def build(numbers: list[int]) -> dict:
+    def _get_main_numbers(
+        draw: Draw,
+    ) -> list[int]:
 
-        numbers = sorted(numbers)
+        return [
+            draw.n1,
+            draw.n2,
+            draw.n3,
+            draw.n4,
+            draw.n5,
+        ]
 
-        even = sum(1 for n in numbers if n % 2 == 0)
-        odd = 5 - even
+    @staticmethod
+    def build_from_history(
+        draws: list[Draw],
+        window_size: int = 100,
+    ) -> dict[str, int | float]:
 
-        consecutive = 0
+        if not draws:
+            raise ValueError(
+                "At least one historical draw is required."
+            )
 
-        for i in range(4):
-            if numbers[i + 1] == numbers[i] + 1:
-                consecutive += 1
+        if window_size <= 0:
+            raise ValueError(
+                "window_size must be greater than zero."
+            )
 
-        decades = {
-            "decade_1_9": 0,
-            "decade_10_19": 0,
-            "decade_20_29": 0,
-            "decade_30_39": 0,
-            "decade_40_49": 0,
+        history = draws[
+            -window_size:
+        ]
+
+        sums: list[int] = []
+        even_counts: list[int] = []
+        consecutive_counts: list[int] = []
+
+        # --------------------------------------------------
+        # Global structural statistics
+        # --------------------------------------------------
+
+        for draw in history:
+
+            numbers = sorted(
+                FeatureEngineering
+                ._get_main_numbers(
+                    draw
+                )
+            )
+
+            sums.append(
+                sum(numbers)
+            )
+
+            even_count = sum(
+                1
+                for number in numbers
+                if number % 2 == 0
+            )
+
+            even_counts.append(
+                even_count
+            )
+
+            consecutive_count = sum(
+                1
+                for index in range(
+                    len(numbers) - 1
+                )
+                if (
+                    numbers[index + 1]
+                    == numbers[index] + 1
+                )
+            )
+
+            consecutive_counts.append(
+                consecutive_count
+            )
+
+        features: dict[
+            str,
+            int | float
+        ] = {
+            "history_size": len(
+                history
+            ),
+
+            "average_sum": round(
+                mean(sums),
+                6,
+            ),
+
+            "average_even_count": round(
+                mean(even_counts),
+                6,
+            ),
+
+            "average_consecutive_pairs": round(
+                mean(
+                    consecutive_counts
+                ),
+                6,
+            ),
         }
 
-        for n in numbers:
+        # --------------------------------------------------
+        # Raw frequency features only
+        #
+        # freq_10_1 ... freq_10_49
+        # freq_20_1 ... freq_20_49
+        # freq_50_1 ... freq_50_49
+        # freq_100_1 ... freq_100_49
+        #
+        # Total: 196
+        # --------------------------------------------------
 
-            if 1 <= n <= 9:
-                decades["decade_1_9"] += 1
+        (
+            frequency_features,
+            _frequency_by_window,
+        ) = FrequencyFeatures.build(
+            history
+        )
 
-            elif 10 <= n <= 19:
-                decades["decade_10_19"] += 1
+        features.update(
+            frequency_features
+        )
 
-            elif 20 <= n <= 29:
-                decades["decade_20_29"] += 1
-
-            elif 30 <= n <= 39:
-                decades["decade_30_39"] += 1
-
-            elif 40 <= n <= 49:
-                decades["decade_40_49"] += 1
-
-        features = {
-
-            "n1": numbers[0],
-            "n2": numbers[1],
-            "n3": numbers[2],
-            "n4": numbers[3],
-            "n5": numbers[4],
-
-            "sum": sum(numbers),
-
-            "mean": mean(numbers),
-
-            "median": median(numbers),
-
-            "min": min(numbers),
-
-            "max": max(numbers),
-
-            "range": max(numbers) - min(numbers),
-
-            "even_count": even,
-
-            "odd_count": odd,
-
-            "consecutive_pairs": consecutive,
-
-            **decades,
-        }
+        # --------------------------------------------------
+        # Intentionally removed in V4-E
+        #
+        # overdue_*
+        # overdue_ratio_*
+        # momentum_*
+        # trend_*
+        # --------------------------------------------------
 
         return features
