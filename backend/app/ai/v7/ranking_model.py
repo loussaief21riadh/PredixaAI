@@ -40,7 +40,9 @@ class V7RankingModel:
     NUMBER_MAX = 49
 
     CANDIDATE_COUNT = 49
-    EXPECTED_FEATURE_COUNT = 12
+    EXPECTED_FEATURE_COUNT = len(
+        V7RankingDataset.MODEL_FEATURES
+    )
 
     TOP_K = 5
 
@@ -235,7 +237,7 @@ class V7RankingModel:
     def fit(
         self,
         dataset: pd.DataFrame,
-    ) -> "V7RankingModel":
+    ) -> "V6BCleanRankingModel":
         """
         Fit the global candidate-ranking Random Forest.
         """

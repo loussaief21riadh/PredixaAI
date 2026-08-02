@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from math import isfinite
 
 from app.ai.v6b_clean.feature_builders.frequency import (
     FrequencyBuilder,
@@ -21,35 +22,44 @@ from app.ai.v6b_clean.feature_builders.short_vs_long import (
     ShortVsLongBuilder,
 )
 from app.ai.v7.constants import (
-    FEATURE_COUNT_BASELINE,
     NUMBER_MAX,
     NUMBER_MIN,
+)
+from app.ai.v7.feature_builders.pair_ratio import (
+    PairRatioBuilder,
+)
+from app.ai.v7.feature_builders.pair_statistics import (
+    PairStatistics,
 )
 from app.models.draw import Draw
 
 
 class V7FeatureAssembler:
     """
-    Predixa AI V7 feature assembler.
+    Predixa AI V7 feature assembler with pair features.
 
-    V7 starts with strict parity against the validated
-    V6B-CLEAN feature pipeline.
-
-    The assembler currently produces:
+    Feature structure:
 
         4 global features
-        49 candidates × 8 candidate features
+
+        49 candidates × 11 candidate features:
+            - rate_10
+            - rate_20
+            - rate_50
+            - rate_100
+            - recency
+            - recency_ratio
+            - short_vs_long
+            - frequency_volatility
+            - pair_frequency
+            - pair_recency
+            - pair_ratio
 
     Total:
-        396 features
-
-    New V7 feature families must be added incrementally
-    and validated against the V6B-CLEAN benchmark.
+        4 + (49 × 11) = 543 features
     """
 
-    VERSION = "V7-FEATURE-ASSEMBLER-BASELINE"
-
-    EXPECTED_FEATURE_COUNT = FEATURE_COUNT_BASELINE
+    VERSION = "V7-FEATURE-ASSEMBLER-PAIR-FEATURES"
 
     GLOBAL_FEATURES = (
         "history_size",
@@ -58,7 +68,7 @@ class V7FeatureAssembler:
         "average_consecutive_pairs",
     )
 
-    CANDIDATE_FEATURES = (
+    BASELINE_CANDIDATE_FEATURES = (
         "rate_10",
         "rate_20",
         "rate_50",
@@ -69,22 +79,32 @@ class V7FeatureAssembler:
         "frequency_volatility",
     )
 
+    PAIR_CANDIDATE_FEATURES = (
+        "pair_frequency",
+        "pair_recency",
+        "pair_ratio",
+    )
+
+    CANDIDATE_FEATURES = (
+        *BASELINE_CANDIDATE_FEATURES,
+        *PAIR_CANDIDATE_FEATURES,
+    )
+
+    EXPECTED_FEATURE_COUNT = (
+        len(GLOBAL_FEATURES)
+        + (
+            NUMBER_MAX
+            - NUMBER_MIN
+            + 1
+        )
+        * len(CANDIDATE_FEATURES)
+    )
+
     def __init__(self) -> None:
-        self.frequency_builder = (
-            FrequencyBuilder()
-        )
-
-        self.recency_builder = (
-            RecencyBuilder()
-        )
-
-        self.recency_ratio_builder = (
-            RecencyRatioBuilder()
-        )
-
-        self.short_vs_long_builder = (
-            ShortVsLongBuilder()
-        )
+        self.frequency_builder = FrequencyBuilder()
+        self.recency_builder = RecencyBuilder()
+        self.recency_ratio_builder = RecencyRatioBuilder()
+        self.short_vs_long_builder = ShortVsLongBuilder()
 
         self.frequency_volatility_builder = (
             FrequencyVolatilityBuilder()
@@ -142,7 +162,7 @@ class V7FeatureAssembler:
             != cls.EXPECTED_FEATURE_COUNT
         ):
             raise ValueError(
-                "Unexpected V7 baseline feature count. "
+                "Unexpected V7 feature count. "
                 f"Expected {cls.EXPECTED_FEATURE_COUNT}, "
                 f"received {len(features)}."
             )
@@ -159,7 +179,7 @@ class V7FeatureAssembler:
                 f"{missing_global_features}"
             )
 
-        missing_candidate_features = []
+        missing_candidate_features: list[str] = []
 
         for candidate_number in range(
             NUMBER_MIN,
@@ -184,23 +204,41 @@ class V7FeatureAssembler:
                 f"{missing_candidate_features[:20]}"
             )
 
-        invalid_values = []
+        invalid_type_features: list[str] = []
+        non_finite_features: list[str] = []
 
         for feature_name, value in (
             features.items()
         ):
-            if not isinstance(
+            if isinstance(
+                value,
+                bool,
+            ) or not isinstance(
                 value,
                 (int, float),
             ):
-                invalid_values.append(
+                invalid_type_features.append(
+                    feature_name
+                )
+                continue
+
+            if not isfinite(
+                float(value)
+            ):
+                non_finite_features.append(
                     feature_name
                 )
 
-        if invalid_values:
+        if invalid_type_features:
             raise ValueError(
                 "V7 features contain non-numeric values: "
-                f"{invalid_values[:20]}"
+                f"{invalid_type_features[:20]}"
+            )
+
+        if non_finite_features:
+            raise ValueError(
+                "V7 features contain non-finite values: "
+                f"{non_finite_features[:20]}"
             )
 
     def build(
@@ -208,7 +246,7 @@ class V7FeatureAssembler:
         history: Sequence[Draw],
     ) -> dict[str, int | float]:
         """
-        Build the complete V7 baseline feature dictionary.
+        Build the complete V7 feature dictionary.
         """
 
         self._validate_history(
@@ -228,6 +266,10 @@ class V7FeatureAssembler:
 
         features.update(
             global_features
+        )
+
+        pair_statistics = PairStatistics(
+            history=history,
         )
 
         for candidate_number in range(
@@ -311,6 +353,44 @@ class V7FeatureAssembler:
             ] = volatility_features[
                 "frequency_volatility"
             ]
+
+            pair_frequency = (
+                pair_statistics.candidate_frequency(
+                    candidate_number
+                )
+            )
+
+            pair_recency = (
+                pair_statistics
+                .candidate_recency_ratio(
+                    candidate_number
+                )
+            )
+
+            pair_ratio = (
+                pair_frequency
+                / (
+                    pair_recency
+                    + PairRatioBuilder.EPSILON
+                )
+            )
+
+            features[
+                f"pair_frequency_{candidate_number}"
+            ] = pair_frequency
+
+            features[
+                f"pair_recency_{candidate_number}"
+            ] = pair_recency
+
+            features[
+                f"pair_ratio_{candidate_number}"
+            ] = round(
+                float(
+                    pair_ratio
+                ),
+                6,
+            )
 
         self._validate_features(
             features

@@ -37,7 +37,9 @@ class V7RankingDataset:
 
     LAG_DRAWS = 1
 
-    EXPECTED_FULL_FEATURE_COUNT = 396
+    EXPECTED_FULL_FEATURE_COUNT = (
+        V7FeatureAssembler.EXPECTED_FEATURE_COUNT
+    )
 
     GLOBAL_FEATURES = (
         "history_size",
@@ -55,6 +57,9 @@ class V7RankingDataset:
         "recency_ratio",
         "short_vs_long",
         "frequency_volatility",
+        "pair_frequency",
+        "pair_recency",
+        "pair_ratio",
     )
 
     MODEL_FEATURES = (
