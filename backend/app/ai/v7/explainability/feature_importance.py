@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -11,13 +12,14 @@ class FeatureImportanceAnalyzer:
     """
     Analyze feature importance from a fitted V7RankingModel.
 
-    The analyzer exposes reusable methods to:
-
-    - verify feature-importance availability;
-    - return raw feature importance values;
-    - return sorted feature importance values;
-    - build a ranked pandas DataFrame;
-    - export the ranked results to CSV.
+    Features:
+        • availability check
+        • raw importances
+        • sorted importances
+        • pandas dataframe
+        • CSV export
+        • JSON export
+        • text report
     """
 
     DATAFRAME_COLUMNS = (
@@ -30,6 +32,7 @@ class FeatureImportanceAnalyzer:
         self,
         model: V7RankingModel,
     ) -> None:
+
         if not isinstance(
             model,
             V7RankingModel,
@@ -43,10 +46,6 @@ class FeatureImportanceAnalyzer:
     def is_available(
         self,
     ) -> bool:
-        """
-        Return True when the fitted underlying estimator exposes
-        feature_importances_.
-        """
 
         if not self.model.is_fitted:
             return False
@@ -59,61 +58,43 @@ class FeatureImportanceAnalyzer:
     def feature_importances(
         self,
     ) -> dict[str, float]:
-        """
-        Return feature importances mapped by feature name.
-        """
 
         if not self.model.is_fitted:
             raise ValueError(
-                "Model must be fitted before extracting "
-                "feature importances."
+                "Model must be fitted."
             )
 
         if not self.is_available():
             raise ValueError(
-                "Underlying model does not expose "
-                "feature importances."
+                "Feature importances are unavailable."
             )
 
-        raw_importances = (
+        importances = (
             self.model.model.feature_importances_
         )
 
-        feature_names = list(
+        feature_names = (
             self.model.feature_columns
         )
 
-        if len(raw_importances) != len(feature_names):
+        if len(importances) != len(feature_names):
             raise ValueError(
-                "Feature importance length mismatch. "
-                f"Expected {len(feature_names)}, "
-                f"received {len(raw_importances)}."
+                "Feature importance length mismatch."
             )
 
-        importances = {
-            feature_name: float(importance)
-            for feature_name, importance in zip(
+        return {
+            feature: float(score)
+            for feature, score in zip(
                 feature_names,
-                raw_importances,
+                importances,
             )
         }
 
-        if len(importances) != len(feature_names):
-            raise ValueError(
-                "Feature importance mapping contains "
-                "duplicate feature names."
-            )
-
-        return importances
-
     def sorted_feature_importances(
         self,
-    ) -> list[tuple[str, float]]:
-        """
-        Return feature importances sorted by descending importance.
-
-        Feature names are used as deterministic tie-breakers.
-        """
+    ) -> list[
+        tuple[str, float]
+    ]:
 
         return sorted(
             self.feature_importances().items(),
@@ -126,29 +107,24 @@ class FeatureImportanceAnalyzer:
     def to_dataframe(
         self,
     ) -> pd.DataFrame:
-        """
-        Return a ranked feature-importance DataFrame.
 
-        Columns:
-            rank
-            feature
-            importance
-        """
+        rows = []
 
-        rows = [
-            {
-                "rank": rank,
-                "feature": feature_name,
-                "importance": importance,
-            }
-            for rank, (
-                feature_name,
-                importance,
-            ) in enumerate(
-                self.sorted_feature_importances(),
-                start=1,
+        for rank, (
+            feature,
+            importance,
+        ) in enumerate(
+            self.sorted_feature_importances(),
+            start=1,
+        ):
+
+            rows.append(
+                {
+                    "rank": rank,
+                    "feature": feature,
+                    "importance": importance,
+                }
             )
-        ]
 
         dataframe = pd.DataFrame(
             rows,
@@ -159,34 +135,7 @@ class FeatureImportanceAnalyzer:
 
         if dataframe.empty:
             raise ValueError(
-                "Feature importance DataFrame is empty."
-            )
-
-        expected_rows = len(
-            self.model.feature_columns
-        )
-
-        if len(dataframe) != expected_rows:
-            raise ValueError(
-                "Unexpected feature importance row count. "
-                f"Expected {expected_rows}, "
-                f"received {len(dataframe)}."
-            )
-
-        if dataframe[
-            "feature"
-        ].duplicated().any():
-            raise ValueError(
-                "Feature importance DataFrame contains "
-                "duplicate feature names."
-            )
-
-        if dataframe[
-            "importance"
-        ].isnull().any():
-            raise ValueError(
-                "Feature importance DataFrame contains "
-                "missing importance values."
+                "Feature importance dataframe is empty."
             )
 
         return dataframe
@@ -195,49 +144,112 @@ class FeatureImportanceAnalyzer:
         self,
         output_path: str | Path,
     ) -> Path:
-        """
-        Export ranked feature importances to a CSV file.
 
-        Parameters
-        ----------
-        output_path
-            Destination CSV path.
-
-        Returns
-        -------
-        Path
-            Resolved path of the generated CSV file.
-        """
-
-        destination = Path(
+        output_path = Path(
             output_path
         ).expanduser()
 
-        if destination.suffix.lower() != ".csv":
+        if output_path.suffix.lower() != ".csv":
             raise ValueError(
-                "output_path must use the .csv extension."
+                "CSV filename must end with .csv"
             )
 
-        destination.parent.mkdir(
+        output_path.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        self.to_dataframe().to_csv(
+            output_path,
+            index=False,
+        )
+
+        if not output_path.exists():
+            raise ValueError(
+                "CSV export failed."
+            )
+
+        return output_path.resolve()
+
+    def to_json(
+        self,
+        output_path: str | Path,
+    ) -> Path:
+        """
+        Export feature importance to JSON.
+        """
+
+        output_path = Path(
+            output_path
+        ).expanduser()
+
+        if output_path.suffix.lower() != ".json":
+            raise ValueError(
+                "JSON filename must end with .json"
+            )
+
+        output_path.parent.mkdir(
             parents=True,
             exist_ok=True,
         )
 
         dataframe = self.to_dataframe()
 
-        dataframe.to_csv(
-            destination,
-            index=False,
+        records = dataframe.to_dict(
+            orient="records"
         )
 
-        if not destination.exists():
-            raise ValueError(
-                "CSV export failed."
+        with output_path.open(
+            "w",
+            encoding="utf-8",
+        ) as file:
+
+            json.dump(
+                records,
+                file,
+                indent=4,
             )
 
-        if destination.stat().st_size == 0:
+        if not output_path.exists():
             raise ValueError(
-                "Generated CSV file is empty."
+                "JSON export failed."
             )
 
-        return destination.resolve()
+        return output_path.resolve()
+
+    def to_text(
+        self,
+    ) -> str:
+        """
+        Return a formatted text report.
+        """
+
+        dataframe = self.to_dataframe()
+
+        lines = []
+
+        lines.append(
+            "=" * 60
+        )
+
+        lines.append(
+            "PredixaAI Feature Importance Report"
+        )
+
+        lines.append(
+            "=" * 60
+        )
+
+        lines.append("")
+
+        for _, row in dataframe.iterrows():
+
+            lines.append(
+                f"{int(row['rank']):>2}. "
+                f"{row['feature']:<35}"
+                f"{row['importance']:.6f}"
+            )
+
+        return "\n".join(
+            lines
+        )
