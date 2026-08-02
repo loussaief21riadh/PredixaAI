@@ -1,0 +1,907 @@
+{
+  "status": "success",
+  "version": "V5-B-FULL-PURGED-T2",
+  "evaluation_type": "strict_walk_forward_purged",
+  "evaluated_draws": 20,
+  "window_size": 100,
+  "max_training_samples": 1500,
+  "feature_count": 396,
+  "top_k": 5,
+  "model": {
+    "average_hits_at_5": 0.4,
+    "precision_at_5": 0.08,
+    "recall_at_5": 0.08,
+    "total_hits": 8,
+    "hit_distribution": {
+      "0": 12,
+      "1": 8,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0
+    },
+    "at_least_1_hit_rate": 0.4,
+    "at_least_2_hit_rate": 0.0
+  },
+  "frequency_baseline": {
+    "average_hits_at_5": 0.6,
+    "total_hits": 12,
+    "hit_distribution": {
+      "0": 10,
+      "1": 9,
+      "2": 0,
+      "3": 1,
+      "4": 0,
+      "5": 0
+    },
+    "at_least_1_hit_rate": 0.5,
+    "at_least_2_hit_rate": 0.05
+  },
+  "previous_draw_baseline": {
+    "average_hits_at_5": 0.55,
+    "total_hits": 11,
+    "hit_distribution": {
+      "0": 11,
+      "1": 7,
+      "2": 2,
+      "3": 0,
+      "4": 0,
+      "5": 0
+    },
+    "at_least_1_hit_rate": 0.45,
+    "at_least_2_hit_rate": 0.1
+  },
+  "random_baseline": {
+    "theoretical": {
+      "expected_average_hits_at_5": 0.5102
+    },
+    "monte_carlo": {
+      "simulations": 1000,
+      "mean_average_hits_at_5": 0.5058,
+      "std_average_hits_at_5": 0.1442,
+      "95_percent_interval": {
+        "lower": 0.25,
+        "upper": 0.8
+      },
+      "predixa_percentile": 0.29,
+      "empirical_p_value": 0.8192
+    }
+  },
+  "previous_draw_diagnostics": {
+    "average_predixa_overlap_with_previous_draw": 0.5,
+    "exact_previous_draw_copy_count": 0,
+    "exact_previous_draw_copy_rate": 0.0,
+    "maximum_possible_overlap": 5
+  },
+  "comparison": {
+    "absolute_lift_vs_frequency": -0.2,
+    "absolute_lift_vs_previous_draw": -0.15,
+    "absolute_lift_vs_random": -0.1102,
+    "beats_frequency": false,
+    "beats_previous_draw": false,
+    "beats_random_expectation": false
+  },
+  "details": [
+    {
+      "draw_date": "2026-05-27",
+      "predicted_top_5": [
+        21,
+        23,
+        38,
+        36,
+        20
+      ],
+      "actual_numbers": [
+        3,
+        4,
+        15,
+        17,
+        41
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        16,
+        30,
+        10,
+        17,
+        22
+      ],
+      "frequency_hits": 1,
+      "previous_draw_top_5": [
+        19,
+        22,
+        27,
+        31,
+        49
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 0,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-05-23",
+      "excluded_previous_draw": "2026-05-25",
+      "last_training_target_available": "2026-05-23"
+    },
+    {
+      "draw_date": "2026-05-30",
+      "predicted_top_5": [
+        31,
+        27,
+        22,
+        23,
+        21
+      ],
+      "actual_numbers": [
+        3,
+        10,
+        31,
+        34,
+        47
+      ],
+      "hits": 1,
+      "frequency_top_5": [
+        16,
+        17,
+        30,
+        10,
+        23
+      ],
+      "frequency_hits": 1,
+      "previous_draw_top_5": [
+        3,
+        4,
+        15,
+        17,
+        41
+      ],
+      "previous_draw_hits": 1,
+      "predixa_overlap_with_previous_draw": 0,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-05-25",
+      "excluded_previous_draw": "2026-05-27",
+      "last_training_target_available": "2026-05-25"
+    },
+    {
+      "draw_date": "2026-06-01",
+      "predicted_top_5": [
+        15,
+        3,
+        4,
+        27,
+        17
+      ],
+      "actual_numbers": [
+        5,
+        19,
+        26,
+        30,
+        33
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        16,
+        17,
+        30,
+        10,
+        23
+      ],
+      "frequency_hits": 1,
+      "previous_draw_top_5": [
+        3,
+        10,
+        31,
+        34,
+        47
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 1,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-05-27",
+      "excluded_previous_draw": "2026-05-30",
+      "last_training_target_available": "2026-05-27"
+    },
+    {
+      "draw_date": "2026-06-03",
+      "predicted_top_5": [
+        47,
+        31,
+        10,
+        15,
+        3
+      ],
+      "actual_numbers": [
+        4,
+        16,
+        17,
+        18,
+        30
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        16,
+        17,
+        30,
+        33,
+        10
+      ],
+      "frequency_hits": 3,
+      "previous_draw_top_5": [
+        5,
+        19,
+        26,
+        30,
+        33
+      ],
+      "previous_draw_hits": 1,
+      "predixa_overlap_with_previous_draw": 0,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-05-30",
+      "excluded_previous_draw": "2026-06-01",
+      "last_training_target_available": "2026-05-30"
+    },
+    {
+      "draw_date": "2026-06-06",
+      "predicted_top_5": [
+        30,
+        19,
+        26,
+        5,
+        33
+      ],
+      "actual_numbers": [
+        13,
+        19,
+        24,
+        32,
+        43
+      ],
+      "hits": 1,
+      "frequency_top_5": [
+        16,
+        17,
+        30,
+        33,
+        10
+      ],
+      "frequency_hits": 0,
+      "previous_draw_top_5": [
+        4,
+        16,
+        17,
+        18,
+        30
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 1,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-01",
+      "excluded_previous_draw": "2026-06-03",
+      "last_training_target_available": "2026-06-01"
+    },
+    {
+      "draw_date": "2026-06-08",
+      "predicted_top_5": [
+        16,
+        30,
+        17,
+        19,
+        26
+      ],
+      "actual_numbers": [
+        24,
+        39,
+        41,
+        43,
+        48
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        16,
+        30,
+        17,
+        33,
+        10
+      ],
+      "frequency_hits": 0,
+      "previous_draw_top_5": [
+        13,
+        19,
+        24,
+        32,
+        43
+      ],
+      "previous_draw_hits": 2,
+      "predixa_overlap_with_previous_draw": 1,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-03",
+      "excluded_previous_draw": "2026-06-06",
+      "last_training_target_available": "2026-06-03"
+    },
+    {
+      "draw_date": "2026-06-10",
+      "predicted_top_5": [
+        19,
+        13,
+        24,
+        30,
+        32
+      ],
+      "actual_numbers": [
+        2,
+        12,
+        14,
+        38,
+        47
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        16,
+        30,
+        17,
+        24,
+        33
+      ],
+      "frequency_hits": 0,
+      "previous_draw_top_5": [
+        24,
+        39,
+        41,
+        43,
+        48
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 1,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-06",
+      "excluded_previous_draw": "2026-06-08",
+      "last_training_target_available": "2026-06-06"
+    },
+    {
+      "draw_date": "2026-06-13",
+      "predicted_top_5": [
+        41,
+        43,
+        24,
+        30,
+        48
+      ],
+      "actual_numbers": [
+        11,
+        27,
+        28,
+        39,
+        41
+      ],
+      "hits": 1,
+      "frequency_top_5": [
+        16,
+        30,
+        17,
+        33,
+        10
+      ],
+      "frequency_hits": 0,
+      "previous_draw_top_5": [
+        2,
+        12,
+        14,
+        38,
+        47
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 0,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-08",
+      "excluded_previous_draw": "2026-06-10",
+      "last_training_target_available": "2026-06-08"
+    },
+    {
+      "draw_date": "2026-06-15",
+      "predicted_top_5": [
+        47,
+        12,
+        14,
+        30,
+        41
+      ],
+      "actual_numbers": [
+        23,
+        25,
+        29,
+        46,
+        49
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        16,
+        30,
+        17,
+        33,
+        10
+      ],
+      "frequency_hits": 0,
+      "previous_draw_top_5": [
+        11,
+        27,
+        28,
+        39,
+        41
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 1,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-10",
+      "excluded_previous_draw": "2026-06-13",
+      "last_training_target_available": "2026-06-10"
+    },
+    {
+      "draw_date": "2026-06-17",
+      "predicted_top_5": [
+        39,
+        27,
+        28,
+        41,
+        12
+      ],
+      "actual_numbers": [
+        1,
+        15,
+        32,
+        37,
+        39
+      ],
+      "hits": 1,
+      "frequency_top_5": [
+        30,
+        16,
+        17,
+        23,
+        33
+      ],
+      "frequency_hits": 0,
+      "previous_draw_top_5": [
+        23,
+        25,
+        29,
+        46,
+        49
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 0,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-13",
+      "excluded_previous_draw": "2026-06-15",
+      "last_training_target_available": "2026-06-13"
+    },
+    {
+      "draw_date": "2026-06-20",
+      "predicted_top_5": [
+        29,
+        25,
+        27,
+        49,
+        23
+      ],
+      "actual_numbers": [
+        5,
+        16,
+        31,
+        37,
+        41
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        30,
+        16,
+        17,
+        33,
+        23
+      ],
+      "frequency_hits": 1,
+      "previous_draw_top_5": [
+        1,
+        15,
+        32,
+        37,
+        39
+      ],
+      "previous_draw_hits": 1,
+      "predixa_overlap_with_previous_draw": 0,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-15",
+      "excluded_previous_draw": "2026-06-17",
+      "last_training_target_available": "2026-06-15"
+    },
+    {
+      "draw_date": "2026-06-22",
+      "predicted_top_5": [
+        15,
+        39,
+        3,
+        12,
+        25
+      ],
+      "actual_numbers": [
+        7,
+        13,
+        30,
+        31,
+        47
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        16,
+        30,
+        17,
+        33,
+        23
+      ],
+      "frequency_hits": 1,
+      "previous_draw_top_5": [
+        5,
+        16,
+        31,
+        37,
+        41
+      ],
+      "previous_draw_hits": 1,
+      "predixa_overlap_with_previous_draw": 0,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-17",
+      "excluded_previous_draw": "2026-06-20",
+      "last_training_target_available": "2026-06-17"
+    },
+    {
+      "draw_date": "2026-06-24",
+      "predicted_top_5": [
+        16,
+        41,
+        31,
+        37,
+        15
+      ],
+      "actual_numbers": [
+        8,
+        26,
+        29,
+        32,
+        38
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        30,
+        16,
+        17,
+        23,
+        29
+      ],
+      "frequency_hits": 1,
+      "previous_draw_top_5": [
+        7,
+        13,
+        30,
+        31,
+        47
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 1,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-20",
+      "excluded_previous_draw": "2026-06-22",
+      "last_training_target_available": "2026-06-20"
+    },
+    {
+      "draw_date": "2026-06-27",
+      "predicted_top_5": [
+        30,
+        31,
+        47,
+        7,
+        13
+      ],
+      "actual_numbers": [
+        18,
+        21,
+        24,
+        35,
+        36
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        30,
+        16,
+        17,
+        23,
+        29
+      ],
+      "frequency_hits": 0,
+      "previous_draw_top_5": [
+        8,
+        26,
+        29,
+        32,
+        38
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 0,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-22",
+      "excluded_previous_draw": "2026-06-24",
+      "last_training_target_available": "2026-06-22"
+    },
+    {
+      "draw_date": "2026-06-29",
+      "predicted_top_5": [
+        32,
+        29,
+        38,
+        26,
+        31
+      ],
+      "actual_numbers": [
+        1,
+        13,
+        27,
+        32,
+        41
+      ],
+      "hits": 1,
+      "frequency_top_5": [
+        30,
+        16,
+        17,
+        24,
+        33
+      ],
+      "frequency_hits": 0,
+      "previous_draw_top_5": [
+        18,
+        21,
+        24,
+        35,
+        36
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 0,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-24",
+      "excluded_previous_draw": "2026-06-27",
+      "last_training_target_available": "2026-06-24"
+    },
+    {
+      "draw_date": "2026-07-01",
+      "predicted_top_5": [
+        24,
+        36,
+        32,
+        18,
+        21
+      ],
+      "actual_numbers": [
+        8,
+        9,
+        10,
+        25,
+        31
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        30,
+        16,
+        17,
+        24,
+        33
+      ],
+      "frequency_hits": 0,
+      "previous_draw_top_5": [
+        1,
+        13,
+        27,
+        32,
+        41
+      ],
+      "previous_draw_hits": 0,
+      "predixa_overlap_with_previous_draw": 1,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-27",
+      "excluded_previous_draw": "2026-06-29",
+      "last_training_target_available": "2026-06-27"
+    },
+    {
+      "draw_date": "2026-07-04",
+      "predicted_top_5": [
+        13,
+        41,
+        27,
+        32,
+        1
+      ],
+      "actual_numbers": [
+        15,
+        31,
+        41,
+        48,
+        49
+      ],
+      "hits": 1,
+      "frequency_top_5": [
+        30,
+        16,
+        10,
+        17,
+        24
+      ],
+      "frequency_hits": 0,
+      "previous_draw_top_5": [
+        8,
+        9,
+        10,
+        25,
+        31
+      ],
+      "previous_draw_hits": 1,
+      "predixa_overlap_with_previous_draw": 0,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-06-29",
+      "excluded_previous_draw": "2026-07-01",
+      "last_training_target_available": "2026-06-29"
+    },
+    {
+      "draw_date": "2026-07-06",
+      "predicted_top_5": [
+        8,
+        10,
+        31,
+        25,
+        9
+      ],
+      "actual_numbers": [
+        16,
+        29,
+        31,
+        36,
+        46
+      ],
+      "hits": 1,
+      "frequency_top_5": [
+        30,
+        16,
+        41,
+        10,
+        17
+      ],
+      "frequency_hits": 1,
+      "previous_draw_top_5": [
+        15,
+        31,
+        41,
+        48,
+        49
+      ],
+      "previous_draw_hits": 1,
+      "predixa_overlap_with_previous_draw": 1,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-07-01",
+      "excluded_previous_draw": "2026-07-04",
+      "last_training_target_available": "2026-07-01"
+    },
+    {
+      "draw_date": "2026-07-08",
+      "predicted_top_5": [
+        15,
+        31,
+        48,
+        41,
+        10
+      ],
+      "actual_numbers": [
+        7,
+        16,
+        18,
+        28,
+        35
+      ],
+      "hits": 0,
+      "frequency_top_5": [
+        30,
+        16,
+        41,
+        10,
+        17
+      ],
+      "frequency_hits": 1,
+      "previous_draw_top_5": [
+        16,
+        29,
+        31,
+        36,
+        46
+      ],
+      "previous_draw_hits": 1,
+      "predixa_overlap_with_previous_draw": 1,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-07-04",
+      "excluded_previous_draw": "2026-07-06",
+      "last_training_target_available": "2026-07-04"
+    },
+    {
+      "draw_date": "2026-07-11",
+      "predicted_top_5": [
+        31,
+        29,
+        16,
+        36,
+        41
+      ],
+      "actual_numbers": [
+        3,
+        16,
+        34,
+        35,
+        38
+      ],
+      "hits": 1,
+      "frequency_top_5": [
+        30,
+        16,
+        41,
+        10,
+        31
+      ],
+      "frequency_hits": 1,
+      "previous_draw_top_5": [
+        7,
+        16,
+        18,
+        28,
+        35
+      ],
+      "previous_draw_hits": 2,
+      "predixa_overlap_with_previous_draw": 1,
+      "predixa_exact_previous_draw_copy": false,
+      "training_samples": 1500,
+      "feature_count": 396,
+      "last_allowed_feature_draw": "2026-07-06",
+      "excluded_previous_draw": "2026-07-08",
+      "last_training_target_available": "2026-07-06"
+    }
+  ],
+  "variant": "full"
+}

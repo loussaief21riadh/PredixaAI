@@ -1,0 +1,39 @@
+{
+  "status": "success",
+  "version": "V5-C-TEST",
+  "evaluated_draws": 2,
+  "details": [
+    {
+      "predicted_top_5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "actual_numbers": [
+        1,
+        10,
+        20,
+        30,
+        40
+      ]
+    },
+    {
+      "predicted_top_5": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "actual_numbers": [
+        7,
+        11,
+        21,
+        31,
+        41
+      ]
+    }
+  ]
+}
