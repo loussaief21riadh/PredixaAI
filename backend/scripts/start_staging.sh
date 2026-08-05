@@ -1,7 +1,21 @@
 #!/bin/sh
 set -eu
 
+SCRIPT_DIR="$(
+    CDPATH= cd "$(dirname "$0")"
+    pwd
+)"
+
+PROJECT_ROOT="$(
+    dirname "$SCRIPT_DIR"
+)"
+
+cd "$PROJECT_ROOT"
+
+export PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+
 echo "Starting PredixaAI ${APP_VERSION:-unknown} in ${APP_ENV:-unknown} mode."
+echo "Project root: $PROJECT_ROOT"
 
 python scripts/check_staging_config.py
 
@@ -10,8 +24,8 @@ if [ -d "alembic/versions" ] \
       -maxdepth 1 \
       -type f \
       -name "*.py" \
-      | grep -q .; then
-
+      | grep -q .
+then
     echo "Applying Alembic migrations."
     alembic upgrade head
 else
@@ -20,7 +34,7 @@ else
     exit 1
 fi
 
-exec uvicorn app.main:app \
+exec python -m uvicorn app.main:app \
     --host 0.0.0.0 \
     --port "${PORT:-8000}" \
     --proxy-headers \
