@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from app.database import Base, engine
-
-# Création des tables SQLAlchemy
-from app.auth.models import User
-
-# Routeurs
 from app.auth.router import router as auth_router
+from app.core.settings import (
+    APP_ENV,
+    CORS_ALLOWED_ORIGINS,
+    PROJECT_NAME,
+    TRUSTED_HOSTS,
+    VERSION,
+)
 from app.dashboard.router import router as dashboard_router
-
 from app.routers import (
     ai,
     draws,
@@ -19,62 +23,146 @@ from app.routers import (
     version,
 )
 
-# Création automatique des tables
-Base.metadata.create_all(bind=engine)
+
+# =====================================================
+# FastAPI application
+# =====================================================
 
 app = FastAPI(
-    title="Predixa AI Enterprise",
-    version="2.3.0",
-    description="Enterprise AI Lottery Prediction Platform",
+    title=f"{PROJECT_NAME} Enterprise",
+    version=VERSION,
+    description=(
+        "Enterprise AI Lottery Prediction Platform"
+    ),
 )
 
 
-@app.get("/", tags=["Root"])
-def root():
+# =====================================================
+# HTTP middleware
+# =====================================================
+
+if CORS_ALLOWED_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(
+            CORS_ALLOWED_ORIGINS
+        ),
+        allow_credentials=True,
+        allow_methods=[
+            "*",
+        ],
+        allow_headers=[
+            "*",
+        ],
+    )
+
+
+if APP_ENV in {
+    "staging",
+    "production",
+}:
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=list(
+            TRUSTED_HOSTS
+        ),
+    )
+
+
+# =====================================================
+# Root
+# =====================================================
+
+@app.get(
+    "/",
+    tags=[
+        "Root",
+    ],
+)
+def root() -> dict[str, str]:
+    """Return basic application information."""
+
     return {
-        "message": "Welcome to Predixa AI Enterprise",
+        "message": (
+            "Welcome to Predixa AI Enterprise"
+        ),
         "version": app.version,
+        "environment": APP_ENV,
         "status": "running",
     }
 
 
-# ==========================
+# =====================================================
 # Authentication
-# ==========================
-app.include_router(auth_router)
+# =====================================================
 
-# ==========================
+app.include_router(
+    auth_router
+)
+
+
+# =====================================================
 # Dashboard
-# ==========================
-app.include_router(dashboard_router)
+# =====================================================
 
-# ==========================
+app.include_router(
+    dashboard_router
+)
+
+
+# =====================================================
 # System
-# ==========================
-app.include_router(health.router)
-app.include_router(version.router)
+# =====================================================
 
-# ==========================
+app.include_router(
+    health.router
+)
+
+app.include_router(
+    version.router
+)
+
+
+# =====================================================
 # Draws
-# ==========================
-app.include_router(draws.router)
+# =====================================================
 
-# ==========================
+app.include_router(
+    draws.router
+)
+
+
+# =====================================================
 # Prediction
-# ==========================
-app.include_router(predict.router)
+# =====================================================
 
-# ==========================
-# CSV Import
-# ==========================
-app.include_router(import_csv.router)
+app.include_router(
+    predict.router
+)
 
-# ==========================
+
+# =====================================================
+# CSV import
+# =====================================================
+
+app.include_router(
+    import_csv.router
+)
+
+
+# =====================================================
 # Statistics
-# ==========================
-app.include_router(statistics.router)
+# =====================================================
 
-# ==========================
-# Artificial Intelligence
-# ==========================
-app.include_router(ai.router)
+app.include_router(
+    statistics.router
+)
+
+
+# =====================================================
+# Artificial intelligence
+# =====================================================
+
+app.include_router(
+    ai.router
+)

@@ -138,3 +138,6 @@ docker-compose.override.yml
 
 Thumbs.db
 .aider*
+
+# Keep the safe PredixaAI environment template
+!backend/.env.example

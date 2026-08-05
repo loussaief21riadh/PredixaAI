@@ -1,0 +1,36 @@
+# Git and editors
+.git
+.github
+.idea
+.vscode
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+*.bak
+sql_app_old_*.db
+
+# Generated files
+logs/
+reports/
+htmlcov/
+.coverage
+openapi.json

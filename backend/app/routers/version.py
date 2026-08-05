@@ -1,11 +1,28 @@
+from __future__ import annotations
+
 from fastapi import APIRouter
 
-router = APIRouter()
+from app.core.settings import (
+    PROJECT_NAME,
+    VERSION,
+)
 
-@router.get("/version")
-def get_version():
-    """Get the version of the application."""
+
+router = APIRouter(
+    tags=[
+        "system",
+    ]
+)
+
+
+@router.get(
+    "/version",
+    summary="Application version",
+)
+def get_version() -> dict[str, str]:
+    """Return the public application name and version."""
+
     return {
-        "app": "LottoVisionAI",
-        "version": "0.1.0"
+        "app": PROJECT_NAME,
+        "version": VERSION,
     }
