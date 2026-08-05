@@ -25,7 +25,7 @@ class V7RankingModel:
         - one global binary Random Forest;
         - one training row per candidate number;
         - 49 candidate rows per historical target draw;
-        - 12 model features per candidate;
+        - 11 active model features per candidate;
         - candidate_number excluded from model features;
         - Top-K selected from the 49 candidate scores.
 
@@ -40,7 +40,9 @@ class V7RankingModel:
     NUMBER_MAX = 49
 
     CANDIDATE_COUNT = 49
-    EXPECTED_FEATURE_COUNT = 12
+    EXPECTED_FEATURE_COUNT = len(
+        V7RankingDataset.MODEL_FEATURES
+    )
 
     TOP_K = 5
 

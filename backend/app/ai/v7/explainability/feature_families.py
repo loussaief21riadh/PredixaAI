@@ -33,6 +33,19 @@ FEATURE_FAMILIES: Final[
     }
 )
 
+# Sprint 5 production model contract:
+# rate_10 remains engineered but is excluded from active
+# explainability families together with MODEL_FEATURES.
+FEATURE_FAMILIES = {
+    family_name: tuple(
+        feature_name
+        for feature_name in family_features
+        if feature_name != "rate_10"
+    )
+    for family_name, family_features
+    in FEATURE_FAMILIES.items()
+}
+
 
 FEATURE_FAMILY_ORDER: Final[
     tuple[str, ...]

@@ -323,7 +323,7 @@ def test_validate_dataset_rejects_missing_model_feature(
 
     dataset = dataset.drop(
         columns=[
-            "rate_10",
+            "rate_20",
         ]
     )
 
@@ -345,7 +345,7 @@ def test_validate_dataset_rejects_missing_values(
 
     dataset.loc[
         0,
-        "rate_10",
+        "rate_20",
     ] = np.nan
 
     with pytest.raises(
@@ -366,7 +366,7 @@ def test_validate_dataset_rejects_non_finite_values(
 
     dataset.loc[
         0,
-        "rate_10",
+        "rate_20",
     ] = np.inf
 
     with pytest.raises(
@@ -523,8 +523,8 @@ def test_correlation_matrix(
     ) == MODEL_FEATURES
 
     assert matrix.loc[
-        "rate_10",
-        "rate_10",
+        "rate_20",
+        "rate_20",
     ] == pytest.approx(
         1.0
     )

@@ -24,7 +24,7 @@ class V7RankingDataset:
     Each candidate row contains:
         - candidate_number
         - 4 global historical features
-        - 8 candidate-specific features
+        - engineered candidate-specific features; rate_10 retained in rows but excluded from MODEL_FEATURES
         - target = 1 if candidate appears in T, else 0
     """
 
@@ -57,9 +57,19 @@ class V7RankingDataset:
         "frequency_volatility",
     )
 
+    PRUNED_MODEL_FEATURES = (
+        "rate_10",
+    )
+
     MODEL_FEATURES = (
         *GLOBAL_FEATURES,
-        *CANDIDATE_FEATURES,
+        "rate_20",
+        "rate_50",
+        "rate_100",
+        "recency",
+        "recency_ratio",
+        "short_vs_long",
+        "frequency_volatility",
     )
 
     def __init__(self) -> None:
